@@ -20,6 +20,17 @@ function templateHTML(title, list, content) {
   `;
 }
 
+function templateList(files) {
+  var list = `<ol>`;
+  let i = 0;
+  while (i < files.length) {
+    list += `<li><a href="/?id=${files[i]}">${files[i]}</a></li>`
+    i++;
+  }
+  list += `</ol>`;
+  return list;
+}
+
 var app = http.createServer(function (request, response) {
   var _url = request.url;
   var queryObject = url.parse(_url, true).query;
@@ -27,61 +38,25 @@ var app = http.createServer(function (request, response) {
 
   if (pathname === '/') {
     if (queryObject.id === undefined) {
+
       fs.readdir('data', function (err, files) {
         var title = 'Welcome';
         var desc = 'Hello!';
 
-        var list = `<ol>`;
-        let i = 0;
-        while (i < files.length) {
-          list += `<li><a href="/?id=${files[i]}">${files[i]}</a></li>`
-          i++;
-        }
-        list += `</ol>`;
-
-        var template = templateHTML(title, list, content);
-
+        var list = templateList(files);
+        var template = templateHTML(title, list, `<h2>${title}</h2><p>${desc}</p>`);
         response.writeHead(200);
         response.end(template);
-
       });
 
 
     } else {
       fs.readdir('data', function (err, files) {
-        var title = 'Welcome';
-        var desc = 'Hello!';
-
-        var list = `<ol>`;
-        let i = 0;
-        while (i < files.length) {
-          list += `<li><a href="/?id=${files[i]}">${files[i]}</a></li>`
-          i++;
-        }
-        list += `</ol>`;
-
-
         fs.readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
           var title = queryObject.id;
-          var template =
-            `<!doctype html>
-            <html>
-            <head>
-              <title>WEB1 - ${title}</title>
-              <meta charset="utf-8">
-            </head>
-            <body>
-              <h1><a href="/">WEB</a></h1>
-              ${list}
-              <h2>${title}</h2>
-              <p>${desc}</p>
-            </body>
-            </html>`;
-          // 200은 성공적으로 전송되었다는 뜻 
+          var list = templateList(files);
+          var template = templateHTML(title, list, `<h2>${title}</h2><p>${desc}</p>`);
           response.writeHead(200);
-          // end 의 매개변수로 무엇을 넣어주느냐에 따라 
-          // 화면에 표시되는 내용이 달라진다! 
-          // response.end(fs.readFileSync(__dirname + _url));
           response.end(template);
         });
       });
