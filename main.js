@@ -3,6 +3,22 @@ var fs = require('fs');
 var url = require('url');
 // require('A'); A 라는 모듈을 사용할 것이라는 뜻 
 
+function templateHTML(title, list, content) {
+  return `
+  <!doctype html>
+  <html>
+  <head>
+  <title>WEB1 - ${title}</title>
+  <meta charset="utf-8">
+  </head>
+  <body>
+  <h1><a href="/">WEB</a></h1>
+  ${list}
+  ${content}
+  </body>
+  </html>
+  `;
+}
 
 var app = http.createServer(function (request, response) {
   var _url = request.url;
@@ -14,7 +30,7 @@ var app = http.createServer(function (request, response) {
       fs.readdir('data', function (err, files) {
         var title = 'Welcome';
         var desc = 'Hello!';
-        
+
         var list = `<ol>`;
         let i = 0;
         while (i < files.length) {
@@ -23,20 +39,7 @@ var app = http.createServer(function (request, response) {
         }
         list += `</ol>`;
 
-        var template =
-          `<!doctype html>
-            <html>
-            <head>
-            <title>WEB1 - ${title}</title>
-            <meta charset="utf-8">
-            </head>
-            <body>
-            <h1><a href="/">WEB</a></h1>
-            ${list}
-            <h2>${title}</h2>
-            <p>${desc}</p>
-            </body>
-            </html>`;
+        var template = templateHTML(title, list, content);
 
         response.writeHead(200);
         response.end(template);
@@ -48,7 +51,7 @@ var app = http.createServer(function (request, response) {
       fs.readdir('data', function (err, files) {
         var title = 'Welcome';
         var desc = 'Hello!';
-        
+
         var list = `<ol>`;
         let i = 0;
         while (i < files.length) {
