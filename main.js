@@ -38,18 +38,14 @@ var app = http.createServer(function (request, response) {
 
   if (pathname === '/') {
     if (queryObject.id === undefined) {
-
       fs.readdir('data', function (err, files) {
         var title = 'Welcome';
         var desc = 'Hello!';
-
         var list = templateList(files);
         var template = templateHTML(title, list, `<h2>${title}</h2><p>${desc}</p>`);
         response.writeHead(200);
         response.end(template);
       });
-
-
     } else {
       fs.readdir('data', function (err, files) {
         fs.readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
