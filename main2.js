@@ -1,6 +1,6 @@
-var http = require('http');
-var fs = require('fs');
-var url = require('url');
+import { createServer } from 'http';
+import { readdir, readFile } from 'fs';
+import { parse } from 'url';
 // require('A'); A 라는 모듈을 사용할 것이라는 뜻 
 
 function templateHTML(title, list, content) {
@@ -31,13 +31,13 @@ function templateList(files) {
   return list;
 }
 
-var app = http.createServer(function (request, response) {
+var app = createServer(function (request, response) {
   var _url = request.url;
-  var queryObject = url.parse(_url, true).query;
-  var pathname = url.parse(_url, true).pathname;
+  var queryObject = parse(_url, true).query;
+  var pathname = parse(_url, true).pathname;
 
   if (pathname === '/') {
-    fs.readdir('data', function (err, files) {
+    readdir('data', function (err, files) {
       let _title = 'Welcome';
       let _desc = 'Hello!';
       var list = templateList(files);
@@ -47,7 +47,7 @@ var app = http.createServer(function (request, response) {
         response.end(template);
       } else {
         _title = queryObject.id;
-        fs.readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
+        readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
           var template = templateHTML(_title, list, `<h2>${_title}</h2><p>${desc}</p>`);
           response.writeHead(200);
           response.end(template);
