@@ -1,4 +1,4 @@
-let fs = require('fs');
+import { readFile } from 'fs';
 
 // readFileSync 동기적 처리 
 // console.log('A');
@@ -9,7 +9,7 @@ let fs = require('fs');
 
 // readFile 비동기적 처리 - NodeJS가 더 선호하는 방식!
 console.log('A');
-fs.readFile('syntax/sample.txt', 'utf8', function(err, result) {
+readFile('syntax/sample.txt', 'utf8', function(err, result) {
     console.log(result);
 });
 // 파일을 읽어오는데, 시간이 좀 걸릴 수 있으니 파일 다 읽으면 function을 네가 알아서 호출하거라.
