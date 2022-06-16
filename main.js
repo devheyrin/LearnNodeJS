@@ -5,33 +5,34 @@ import { parse as qsParse } from 'querystring';
 
 // require('A'); A 라는 모듈을 사용할 것이라는 뜻 
 
-function templateHTML(title, list, content, control) {
-  return `
-  <!doctype html>
-  <html>
-  <head>
-  <title>WEB1 - ${title}</title>
-  <meta charset="utf-8">
-  </head>
-  <body>
-  <h1><a href="/">WEB</a></h1>
-  ${list}
-  ${control}
-  ${content}
-  </body>
-  </html>
-  `;
-}
-
-function templateList(files) {
-  var list = `<ol>`;
-  let i = 0;
-  while (i < files.length) {
-    list += `<li><a href="/?id=${files[i]}">${files[i]}</a></li>`
-    i++;
-  }
-  list += `</ol>`;
-  return list;
+let template = {
+  html(title, list, content, control) {
+    return `
+    <!doctype html>
+    <html>
+    <head>
+    <title>WEB1 - ${title}</title>
+    <meta charset="utf-8">
+    </head>
+    <body>
+    <h1><a href="/">WEB</a></h1>
+    ${list}
+    ${control}
+    ${content}
+    </body>
+    </html>
+    `;
+  }, 
+  list(files) {
+    var list = `<ol>`;
+    let i = 0;
+    while (i < files.length) {
+      list += `<li><a href="/?id=${files[i]}">${files[i]}</a></li>`
+      i++;
+    }
+    list += `</ol>`;
+    return list;
+  }, 
 }
 
 var app = createServer(function (request, response) {
@@ -45,20 +46,21 @@ var app = createServer(function (request, response) {
       readdir('data', function (err, files) {
         var title = 'Welcome';
         var desc = 'Hello!';
-        var list = templateList(files);
-        var template = templateHTML(title, list,
+        var list = template.list(files);
+        var html = template.html(title, list,
           `<h2>${title}</h2><p>${desc}</p>`,
           `<a href="/get/create">글쓰기</a>`);
         response.writeHead(200);
-        response.end(template);
+        response.end(html);
       });
     } else {
       readdir('data', function (err, files) {
         readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
           var title = queryObject.id;
-          var list = templateList(files);
-          var template = templateHTML(title, list,
+          var list = template.list(files);
+          var html = template.html(title, list,
             `<h2>${title}</h2><p>${desc}</p>`,
+
             `<a href="/get/create">글쓰기</a>
              <a href="/get/update?id=${title}">수정</a>
              <form action="/post/delete" method="post">
@@ -66,15 +68,15 @@ var app = createServer(function (request, response) {
              <input type="submit" value="삭제">
              </form>`);
           response.writeHead(200);
-          response.end(template);
+          response.end(html);
         });
       });
     }
   } else if (pathname === '/get/create') {
     readdir('data', function (err, files) {
       var title = 'WEB - 글쓰기';
-      var list = templateList(files);
-      var template = templateHTML(title, list,
+      var list = template.list(files);
+      var html = template.html(title, list,
         `<form action="/post/create" method="post">
           <p><input type="text" name="title" placeholder="제목"></p>
           <p>
@@ -83,10 +85,9 @@ var app = createServer(function (request, response) {
           <p>
               <input type="submit">
           </p>
-          </form>`,
-        '');
+          </form>`, '')
       response.writeHead(200);
-      response.end(template);
+      response.end(html);
     });
 
   } else if (pathname == '/post/create') {
@@ -110,8 +111,8 @@ var app = createServer(function (request, response) {
     readdir('data', function (err, files) {
       readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
         var title = queryObject.id;
-        var list = templateList(files);
-        var template = templateHTML(title, list,
+        var list = template.list(files);
+        var html = template.html(title, list,
           `<form action="/post/update" method="post">
           <input type="hidden" name="id" value="${title}">
           <p><input type="text" name="title" placeholder="제목"
@@ -122,10 +123,9 @@ var app = createServer(function (request, response) {
           <p>
               <input type="submit">
           </p>
-          </form>`,
-          '');
+          </form>`, '')
         response.writeHead(200);
-        response.end(template);
+        response.end(html);
       });
     });
   } else if (pathname == '/post/update') {
@@ -158,7 +158,7 @@ var app = createServer(function (request, response) {
     request.on('end', function () {
       let post = qsParse(body);
       let id = post.id;
-      unlink(`data/${id}`, function(err) {
+      unlink(`data/${id}`, function (err) {
         response.writeHead(302, { Location: `/` });
         response.end();
       });
