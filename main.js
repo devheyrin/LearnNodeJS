@@ -1,39 +1,13 @@
 import { createServer } from 'http';
 import { writeFile, readdir, readFile, rename, unlink } from 'fs';
 import { parse } from 'url';
+import { parse as pathParse } from 'path';
 import { parse as qsParse } from 'querystring';
+import Template from './lib/Template.js';
 
 // require('A'); A 라는 모듈을 사용할 것이라는 뜻 
 
-let template = {
-  html(title, list, content, control) {
-    return `
-    <!doctype html>
-    <html>
-    <head>
-    <title>WEB1 - ${title}</title>
-    <meta charset="utf-8">
-    </head>
-    <body>
-    <h1><a href="/">WEB</a></h1>
-    ${list}
-    ${control}
-    ${content}
-    </body>
-    </html>
-    `;
-  }, 
-  list(files) {
-    var list = `<ol>`;
-    let i = 0;
-    while (i < files.length) {
-      list += `<li><a href="/?id=${files[i]}">${files[i]}</a></li>`
-      i++;
-    }
-    list += `</ol>`;
-    return list;
-  }, 
-}
+let template = Template;
 
 var app = createServer(function (request, response) {
   var _url = request.url;
@@ -55,8 +29,9 @@ var app = createServer(function (request, response) {
       });
     } else {
       readdir('data', function (err, files) {
-        readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
-          var title = queryObject.id;
+        let filteredId = pathParse(queryObject.id).base;
+        readFile(`data/${filteredId}`, 'utf-8', function (err, desc) {
+          var title = filteredId;
           var list = template.list(files);
           var html = template.html(title, list,
             `<h2>${title}</h2><p>${desc}</p>`,
@@ -109,8 +84,9 @@ var app = createServer(function (request, response) {
     });
   } else if (pathname == '/get/update') {
     readdir('data', function (err, files) {
-      readFile(`data/${queryObject.id}`, 'utf-8', function (err, desc) {
-        var title = queryObject.id;
+      let filteredId = pathParse(queryObject.id).base;
+      readFile(`data/${filteredId}`, 'utf-8', function (err, desc) {
+        var title = filteredId;
         var list = template.list(files);
         var html = template.html(title, list,
           `<form action="/post/update" method="post">
@@ -136,11 +112,12 @@ var app = createServer(function (request, response) {
     request.on('end', function () {
       let post = qsParse(body);
       let id = post.id;
+      let filteredId = pathParse(id).base;
       let title = post.title;
       let desc = post.desc;
       console.log(post);
       // 예전파일명을 새파일명으로 수정! 
-      rename(`data/${id}`, `data/${title}`, function (err) {
+      rename(`data/${filteredId}`, `data/${title}`, function (err) {
         console.log('renamed');
         // 수정된 파일명에 내용 쓰기! 
         writeFile(`data/${title}`, desc, 'utf8',
@@ -158,7 +135,8 @@ var app = createServer(function (request, response) {
     request.on('end', function () {
       let post = qsParse(body);
       let id = post.id;
-      unlink(`data/${id}`, function (err) {
+      let filteredId = pathParse(id).base;
+      unlink(`data/${filteredId}`, function (err) {
         response.writeHead(302, { Location: `/` });
         response.end();
       });
