@@ -1,6 +1,27 @@
 {
-    "type": "module",
-    "dependencies": {
-        "pm2": "^5.2.0"
-    }
+  "type": "module",
+  "dependencies": {
+    "pm2": "^5.2.0",
+    "sanitize-html": "^2.7.0"
+  },
+  "name": "learnnodejs",
+  "version": "1.0.0",
+  "main": "main.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devheyrin/LearnNodeJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devheyrin/LearnNodeJS/issues"
+  },
+  "homepage": "https://github.com/devheyrin/LearnNodeJS#readme",
+  "description": ""
 }
